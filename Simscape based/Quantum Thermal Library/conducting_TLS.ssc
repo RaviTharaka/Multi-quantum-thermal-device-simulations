@@ -1,0 +1,103 @@
+component conducting_TLS
+%Conducting TLS
+% Contains a single TLS interacting with two thermal baths simultaneously.
+% TLS energy level is given by 'w', while 'k1' and 'k2' modulates the 
+% strengths of its interactions with the respective thermal baths.
+% 
+% Terminals 'B1' and 'B2' connects to thermal ports at a given temperature.
+% The bottom '0K' terminal should be connected to absolute zero.
+% 
+% Author - Ravi T. Wijesekara
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        b1 = quantum_thermal; % B1
+        b2 = quantum_thermal; % B2
+        gnd = quantum_thermal; % 
+    end
+
+    % Define device parameters
+    parameters
+        % k1 and k2 modulates the thermal interaction strengths
+        k1 = {0.01,'1'}; % B1 interaction strength (k1)
+        k2 = {0.01,'1'}; % B2 interaction strength (k2)
+
+        % w specifies the energy level difference of the TLS
+        w = {1,'1'}; % TLS frequency (w)      
+    end
+
+    % Define the output 'Physical Signal Ports' (i.e., to Simulink signals)
+    outputs
+        diag = zeros(1,2); % dia
+        ofdiag = zeros(1,1); % ofdia
+    end
+
+    % Define through, across, and internal variables
+    variables
+        % Density matrix elements
+        p11 = {value = {0.5, '1'}, priority = priority.high};
+        p22 = {value = {0.5, '1'}, priority = priority.high};
+        
+        % Temperatures
+        T1 = {value = {0.2, '1'}, priority = priority.low};
+        T2 = {value = {0.2, '1'}, priority = priority.low};
+        
+        % Inward heat flows
+        J1 = {value = {0, '1'}, priority = priority.low};
+        J2 = {value = {0, '1'}, priority = priority.low};
+    end
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        % Dynamical equations for the density matrix
+        {1,'s'} * p11.der == - T112 - T212;
+        {1,'s'} * p22.der == + T112 + T212;
+
+        % Defining the terminal temperatures
+        T1 == b1.T;
+        T2 == b2.T;
+
+        % Defining the inwards heat flows
+        J1 == - h * w * T112;
+        J2 == - h * w * T212;
+
+        diag == [p11,p22];
+        ofdiag == [0];
+    end
+
+    % Associate through variables with correct input and output nodes
+    branches
+        J1 : b1.J -> gnd.J;
+        J2 : b2.J -> gnd.J;
+    end    
+
+    % Define intermediate values that are helpful
+    intermediates
+        % Units 
+        h = b1.h;
+        k = b1.k;
+
+        % Transition rate 'Tabc' due to bath 'a' from state 'b' to state 'c'
+        T112 = j1 * ( (1+n1) * p11 - n1 * p22 );
+        T212 = j2 * ( (1+n2) * p11 - n2 * p22 );
+
+        % Spectral density functions
+        j1 = k1 * w; % B1 spectral density (J1[w])
+        j2 = k2 * w; % B2 spectral density (J2[w])
+
+        % Bose-Einstein distributions 
+        n1 = 1/(exp( (h * w)/(k * T1) ) - 1); % B-E distribution of B1 (n1[T1,w])
+        n2 = 1/(exp( (h * w)/(k * T2) ) - 1); % B-E distribution of B2 (n2[T2,w])
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_conducting_TLS.png';
+        b1 : Side = left;
+        b2 : Side = right;
+        gnd : Side = bottom;
+        diag : Side = top;
+        ofdiag : Side = top;
+    end
+
+end

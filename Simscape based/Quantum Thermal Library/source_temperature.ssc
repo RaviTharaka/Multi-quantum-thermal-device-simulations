@@ -1,0 +1,43 @@
+component source_temperature
+%Temperature source
+% Generates and outputs a fixed temperature that does not change no matter
+% how much heat current is taken out. Effectively models a infinite heat 
+% capacity thermal bath.
+% 
+% Author - Ravi T. Wijesekara    
+
+    % Define device parameters
+    parameters
+        % Temperature being outputted
+        temp = {0.2, '1'}; % Absolute temperature
+    end
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        % Single output port giving out the temperature
+        out = quantum_thermal; % 
+    end
+
+    % Define through, across, and internal variables
+    variables
+        % Heat flow being outputted. 
+        J = {0,'1'}; % Heat flow rate
+    end
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        out.T == temp;
+    end
+
+    % Associate through variables with correct input and output nodes
+    branches
+        % Output heat comes from the reference (ground) and flows out.
+        J : * -> out.J;
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_source_temperature.png';
+        out : Side = right;
+    end
+end

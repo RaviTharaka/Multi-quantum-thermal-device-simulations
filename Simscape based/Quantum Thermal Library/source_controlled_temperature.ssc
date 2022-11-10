@@ -1,0 +1,43 @@
+component source_controlled_temperature
+%Controlled temperature source
+% Generates and outputs a time-varying temperature that is not affected by 
+% any heat current being taken out. Effectively models a infinite heat 
+% capacity thermal bath. The input physical signal 'Tin' determines the 
+% outputted temperature.
+% 
+% Author - Ravi T. Wijesekara    
+
+    % Define the input 'Physical Signal Ports' (i.e., from Simulink signals)
+    inputs
+        Tin = {0, '1' }; % Tin
+    end
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        % Single output port giving out the temperature
+        out = quantum_thermal; % 
+    end
+
+    % Define through, across, and internal variables
+    variables
+        % Heat flow being outputted. 
+        J = {0,'1'}; % Heat flow rate
+    end
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        out.T == Tin;
+    end
+
+    % Associate through variables with correct input and output nodes
+    branches
+        % Output heat comes from the reference (ground) and flows out.
+        J : * -> out.J;
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_source_controlled_temperature.png';
+        out : Side = right;
+    end
+end

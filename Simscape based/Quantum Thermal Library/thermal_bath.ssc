@@ -1,0 +1,52 @@
+component thermal_bath
+%Thermal bath
+% Describes a thermal bath with a finite heat capacity. Similar to an 
+% electrical capacitor. However, has only one terminal since temperatures
+% are always referred to absolute zero (ground).
+% 
+% Defining equation - mC * dT/dt = J
+%
+% The parameter "mC" defines the heat capacity of the bath. The initial 
+% temperature can also be a parameter if necessary.
+%
+% Author - Ravi T. Wijesekara    
+
+    % Define device parameters
+    parameters
+        % Heat capacity of the bath
+        mC = {1,'s'} % Heat capacity (mC)
+    end
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        out = quantum_thermal; %
+    end
+
+    % Define through, across, and internal variables
+    variables
+        % Internal temperature and its initial value
+        T = {0.2,'1'}; % Initial temperature
+
+        % Heat flow going out
+        J = {0,'1'}; % Heat flow rate
+    end
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        assert (mC > 0, 'Non positive heat capacity encountered')
+        assert (T > 0, 'Non positive temperature encountered')
+        out.T == T;
+        J == - mC * T.der;
+    end
+
+    % Associate through variables with correct input and output nodes
+    branches
+        J : * -> out.J;
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_thermal_bath.png';
+        out : Side = top;
+    end
+end

@@ -1,0 +1,41 @@
+component sensor_temperature
+%Temperature sensor
+% A primary measuring device of the library. Measures the temperature 
+% of the node it connects to and outputs it as a physical signal. Modelled
+% as an ideal device. Hence, it does not draw any thermal flow into itself.
+% 
+% Author - Ravi T. Wijesekara
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        inp = quantum_thermal; %
+    end
+
+    % Define the output 'Physical Signal Ports' (i.e., to Simulink signals)
+    outputs
+        sense = {0,'1'}; %
+    end
+
+    % Define through, across, and internal variables
+    variables
+        J = {0,'1'};    % Heat flow rate through
+    end
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        sense == inp.T;
+        J == 0;
+    end
+
+    % Associate through variables with correct input and output nodes
+    branches
+        % Input heat comes from the input port and flows to ground.
+        J : inp.J -> *;
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_sensor_temperature.png';
+        inp : Side = left;
+    end
+end

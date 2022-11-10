@@ -1,0 +1,192 @@
+component thermal_transistor_Joul
+%Thermal transistor
+% Contains three TLSs all interacting with each other in the ultrastrong 
+% regime under Ising sigmaZ-sigmaZ type couplings. The interplay between
+% the system's interactions with three external thermal baths creates the
+% transistor action.
+% 
+% The three TLS energy levels are given by 'wL', 'wM', and 'wR'.
+% The inter-TLS Ising sigmaZ-sigmaZ type coupling strengths are given by 
+% 'wLM', 'wMR', and 'wRL'.
+% The coefficients 'kL', 'kM', and 'kR' modulates the strengths of the TLS
+% interactions with the respective thermal baths.
+% 
+% Terminals 'BL', 'BM', and 'BR' connects to thermal ports at a given 
+% temperature. When properly tuned, the device would control the heat flow
+% from the high temperature bath 'BL' to low temperature bath 'BR' in
+% accordance with the temperature at the control bath 'BM'.
+% The bottom '0K' terminal should be connected to absolute zero.
+% 
+% Author - Ravi T. Wijesekara
+% Original paper -  Quantum Thermal Transistor, Physical Review Letters, 
+% 2016, K. Joulain et al.
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        bL = quantum_thermal; % BL
+        bM = quantum_thermal; % BM
+        bR = quantum_thermal; % BR
+        gnd = quantum_thermal; % 
+    end
+
+    % Define device parameters
+    parameters
+        % k1 and k2 modulates the thermal interaction strengths
+        kL = {0.01,'1'}; % BL interaction strength (kL)
+        kM = {0.01,'1'}; % BM interaction strength (kM)
+        kR = {0.01,'1'}; % BR interaction strength (kR)
+
+        % wL, wM, wR specifies the energy level difference of the three TLSs
+        wL = {0.0,'1'}; % TLS frequency (wL)      
+        wM = {0.1,'1'}; % TLS frequency (wM)      
+        wR = {0.0,'1'}; % TLS frequency (wR)      
+
+        % wLM, wMR, wRL specifies the inter-TLS interaction strengths
+        wLM = {1,'1'}; % L-M interaction (wLM)      
+        wMR = {1,'1'}; % M-R interaction (wMR)      
+        wRL = {0,'1'}; % R-L interaction (wRL)     
+    end
+
+    % Define the output 'Physical Signal Ports' (i.e., to Simulink signals)
+    outputs
+        diag   = zeros(1,8); % dia
+        ofdiag = zeros(1,1); % ofdia
+    end
+
+    % Define through, across, and internal variables
+    variables
+        % Density matrix elements
+        p11 = {value = {0, '1'}, priority = priority.high};
+        p22 = {value = {0, '1'}, priority = priority.high};
+        p33 = {value = {1, '1'}, priority = priority.high};
+        p44 = {value = {0, '1'}, priority = priority.high};
+        p55 = {value = {0, '1'}, priority = priority.high};
+        p66 = {value = {0, '1'}, priority = priority.high};
+        p77 = {value = {0, '1'}, priority = priority.high};
+        p88 = {value = {0, '1'}, priority = priority.high};
+
+        % Temperatures
+        TL = {value = {0.2, '1'}, priority = priority.low};
+        TM = {value = {0.2, '1'}, priority = priority.low};
+        TR = {value = {0.2, '1'}, priority = priority.low};
+        
+        % Inward heat flows
+        JL = {value = {0, '1'}, priority = priority.low};
+        JM = {value = {0, '1'}, priority = priority.low};
+        JR = {value = {0, '1'}, priority = priority.low};
+    end
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        % Dynamical equations for the density matrix
+        {1,'s'} * p11.der == + T151 + T231 + T321;
+        {1,'s'} * p22.der == + T162 + T242 - T321;
+        {1,'s'} * p33.der == + T173 - T231 + T343;
+        {1,'s'} * p44.der == + T184 - T242 - T343;
+        {1,'s'} * p55.der == - T151 + T275 + T365;
+        {1,'s'} * p66.der == - T162 + T286 - T365;
+        {1,'s'} * p77.der == - T173 - T275 + T387;
+        {1,'s'} * p88.der == - T184 - T286 - T387;
+
+        % Defining the terminal temperatures
+        TL == bL.T;
+        TM == bM.T;
+        TR == bR.T;
+
+        % Defining the inwards heat flows
+        JL == - h * ( w_func(5,1,freqs) * T151 + w_func(6,2,freqs) * T162 + w_func(7,3,freqs) * T173 + w_func(8,4,freqs) * T184 );
+        JM == - h * ( w_func(3,1,freqs) * T231 + w_func(4,2,freqs) * T242 + w_func(7,5,freqs) * T275 + w_func(8,6,freqs) * T286 );
+        JR == - h * ( w_func(2,1,freqs) * T321 + w_func(4,3,freqs) * T343 + w_func(6,5,freqs) * T365 + w_func(8,7,freqs) * T387 );
+        
+        diag   == [p11,p22,p33,p44,p55,p66,p77,p88];
+        ofdiag == [0];
+    end
+    
+    % Associate through variables with correct input and output nodes
+    branches
+        JL : bL.J -> gnd.J;
+        JM : bM.J -> gnd.J;
+        JR : bR.J -> gnd.J;
+    end  
+
+    % Define intermediate values that are helpful
+    intermediates
+        % Units 
+        h = bL.h;
+        k = bL.k;
+
+        % Frequencies of the energy levels
+        freqs = 0.5 * [+ wL + wM + wR + wLM + wMR + wRL, ...
+                       + wL + wM - wR + wLM - wMR - wRL, ...
+                       + wL - wM + wR - wLM - wMR + wRL, ...
+                       + wL - wM - wR - wLM + wMR - wRL, ...
+                       - wL + wM + wR - wLM + wMR - wRL, ...
+                       - wL + wM - wR - wLM - wMR + wRL, ...
+                       - wL - wM + wR + wLM - wMR - wRL, ...
+                       - wL - wM - wR + wLM + wMR + wRL, ...
+        ];
+        
+        % Transition rate 'Tabc' due to bath 'a' from state 'b' to state 'c'
+        T151 = T_func(TL, kL, 5, 1, freqs, p55, p11, h, k);
+        T162 = T_func(TL, kL, 6, 2, freqs, p66, p22, h, k);
+        T173 = T_func(TL, kL, 7, 3, freqs, p77, p33, h, k);
+        T184 = T_func(TL, kL, 8, 4, freqs, p88, p44, h, k);
+        
+        T231 = T_func(TM, kM, 3, 1, freqs, p33, p11, h, k);
+        T242 = T_func(TM, kM, 4, 2, freqs, p44, p22, h, k);
+        T275 = T_func(TM, kM, 7, 5, freqs, p77, p55, h, k);
+        T286 = T_func(TM, kM, 8, 6, freqs, p88, p66, h, k);
+        
+        T321 = T_func(TR, kR, 2, 1, freqs, p22, p11, h, k);
+        T343 = T_func(TR, kR, 4, 3, freqs, p44, p33, h, k);
+        T365 = T_func(TR, kR, 6, 5, freqs, p66, p55, h, k);
+        T387 = T_func(TR, kR, 8, 7, freqs, p88, p77, h, k);
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_thermal_transistor_Joul.png';
+        bL : Side = top;
+        bM : Side = left;
+        bR : Side = bottom;
+        gnd : Side = right;
+        diag : Side = right;
+        ofdiag : Side = right;
+    end
+
+end
+
+% Function for bath induced transition rates T(B,i,j)
+function out = T_func(TB,kB,i,j,freqs,pii,pjj,h,k)
+    definitions
+        w = w_func(i,j,freqs);
+        jB = J_func(kB,w);
+        n = n_func(TB,w,h,k);
+
+        out = jB * ( (1+n) * pii - n * pjj);
+    end
+end
+
+% Function for energy level differences
+function out = w_func(i,j,freqs)
+    definitions
+        out = freqs(i)-freqs(j);
+    end
+end
+
+% Function for Ohmic spectral density
+function out = J_func(k, w)
+   definitions
+      out = k * w;
+   end
+end
+
+% Function for Bose-Einstein distribution
+function out = n_func(T,w,h,k)
+   definitions
+      out = 1/(exp( (h * w)/(k * T) ) - 1);
+   end
+end
+
+
+

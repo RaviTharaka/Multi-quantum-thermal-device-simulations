@@ -1,0 +1,36 @@
+component custom_units
+%Custom unit reference 
+% This changes the nodes it connects to from using natural units to some 
+% other system of units. Here, 
+%   h - Reduced Planck constant
+%   k - Boltzmann consant
+% Default values refer to SI units, but can be changed as necessary. If no
+% block of this type is used, natural units will be used. Only ONE block
+% of this type can be used in any single simulation.
+%
+% Author - Ravi T. Wijesekara
+    
+    % Define device parameters
+    parameters
+        h = {1.0546e-34, '1'}; % Reduced Planck constant
+        k = {1.3806e-23, '1'}; % Boltzmann's constant
+    end
+
+    % Define the output 'Physical Signal Ports' (i.e., to Simulink signals)    
+    nodes
+        % Output node propagating the newly set units
+        units = quantum_thermal(h=h,k=k); %
+    end
+
+    % Equations checking the validity of the provided values
+    equations
+        assert (h > 0);
+        assert (k > 0);
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_custom_units.png';
+        units : Side = right;
+    end
+end

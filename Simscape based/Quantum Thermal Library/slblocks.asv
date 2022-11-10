@@ -1,0 +1,19 @@
+function blkStruct = slblocks
+% This is a matlab-specified function for setting up a custom Simulink 
+% or Simscape library.
+%   1. The library SLX file should be in the same folder as this function.
+%   2. The folder must be in the matlab path (Home >> Set Path)
+%   3. After above instructions, to add the library, in Simulink Library 
+%         Browser, right click the left pane and select "Refresh Library Browser"
+% This matlab-specified function specifies that the library 'mylib'
+% should appear in the Library Browser with the 
+% name 'My Library'
+
+    Browser.Library = 'Quanatum_Thermal_Library';
+    % the name of the library
+
+    Browser.Name = 'Quantum Thermal Library';
+    % 'My Library' is the library name that appears
+    % in the Library Browser
+
+    blkStruct.Browser = Browser;

@@ -1,0 +1,44 @@
+component sensor_heat_flow
+%Heat flow rate sensor
+% A primary measuring device of the library. Measures the heat flow 
+% through its two terminals and outputs it as a physical signal. Modelled
+% as an ideal device. Hence, it does not present any resistance to the
+% thermal flow through it.
+% 
+% Author - Ravi T. Wijesekara
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        inp = quantum_thermal; %
+        out = quantum_thermal; %
+    end
+
+    % Define the output 'Physical Signal Ports' (i.e., to Simulink signals)
+    outputs
+        sense = {0,'1'}; %
+    end
+
+    % Define through, across, and internal variables
+    variables
+        J = {0,'1'};    % Heat flow rate through
+    end
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        sense == J;
+        inp.T == out.T;
+    end
+
+    % Associate through variables with correct input and output nodes
+    branches
+        J : inp.J -> out.J;
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_sensor_heat_flow.png';
+        inp : Side = left;
+        out : Side = right;
+        sense : Side = right;
+    end
+end

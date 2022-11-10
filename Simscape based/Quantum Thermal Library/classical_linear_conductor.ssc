@@ -1,0 +1,48 @@
+component classical_linear_conductor
+%Classical linear condutor
+% Simplest thermal device possible. Equivalent to a resistor in the 
+% electrical domain. The heat flow rate through it is proportional to the
+% temperature difference between its two terminals.
+%
+% Defining equation - J = K (T1-T2)
+%
+% The parameter "K" defines the thermal conductivity of the device.
+% 
+% Author - Ravi T. Wijesekara   
+    
+    % Define device parameters
+    parameters
+        K = {1,'1'}; % Classical conductivity
+    end
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        inp = quantum_thermal; % +
+        out = quantum_thermal; % -
+    end
+
+    % Define through, across, and internal variables
+    variables
+        dT = {1,'1'}; % Temparature difference
+        J = {0,'1'}; % Heat flow rate through
+    end
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        assert (K >= 0, 'Non positive conductivity encountered')
+        dT == inp.T - out.T;
+        J == K * dT;
+    end
+
+    % Associate through variables with correct input and output nodes
+    branches
+        J : inp.J -> out.J
+    end
+
+     % Define icons and where the ports come out
+    annotations
+        Icon = 'ICON_classical_linear_conductor.png';
+        inp : Side = left;
+        out : Side = right;
+    end
+end

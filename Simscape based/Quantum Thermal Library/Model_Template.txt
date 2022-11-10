@@ -1,0 +1,53 @@
+component temperature_source
+%<DEVICE NAME>
+% <DESCRIPTION>
+% 
+% 
+% 
+% Author - Ravi T. Wijesekara    
+
+    % Define device parameters
+    parameters
+        
+    end
+
+    % Define the 'Physical Conserving Ports' (i.e., network terminals)
+    nodes
+        
+    end
+    
+    % Define the input 'Physical Signal Ports' (i.e., from Simulink signals)
+    inputs
+
+    end
+
+    % Define the output 'Physical Signal Ports' (i.e., to Simulink signals)
+    outputs
+
+    end
+
+    % Define through, across, and internal variables
+    variables
+
+    end
+
+    % Define intermediate values that are helpful
+    intermediates
+
+    end 
+
+    % Define variable behaviors that needs to be conserved always
+    equations
+        
+    end
+
+    % Associate through variables with correct input and output nodes
+    branches
+
+    end
+
+    % Define icons and where the ports come out
+    annotations
+        
+    end
+end

@@ -1,0 +1,11 @@
+Simscape Library for Quantum Thermal Devices under the Intermediate Bath Formalism
+
+Author - Ravi T. Wijesekara
+
+Basic setup instructions - 
+	1. Add the folder containing this README file to Matlab's system path (Matlab >> Home tab >> Set Path).
+	2. Run Simulink (Matlab >> Home tab >> Simulink).
+	3. In Simulink, select Library Browser (Simulink >> Library tab >> Library Browser).
+	4. In Simulink Library Browser, right-click the left pane (which lists all the available Simulink and Simscape libraries), and select 'Refresh Library Browser'.
+	5. A library called 'Quantum Thermal Devices' should now appear in the left pane.
+	6. Once that library is selected, the right pane should display all the device models, which can be dragged and dropped to a Simulink workspace.

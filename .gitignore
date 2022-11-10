@@ -1,0 +1,12 @@
+*
+!*/
+!.gitignore
+!*.asc
+!*.asy
+!*.txt
+!*.slx
+!*.asv
+!*.m
+!*.png
+!*.svg
+!*.ssc

@@ -1,0 +1,12 @@
+LTSpice Library for Quantum Thermal Devices under the Intermediate Bath Formalism
+
+Author - Ravi T. Wijesekara
+
+Basic setup instructions - 
+	1. Open up LTSpice and go to Tools >> Control Panel.
+	2. Go to the 'Sym. & Lib. Search Paths' tab.
+	3. Add the directory "...\LTSpice based\Quantum Thermal Library" to both the 'Symbol Search Path' and 'Library Search Path'
+	4. Now you should be able to run the test LTSpice files without issue.
+	5. To add any quantum thermal device into a circuit, in the 'Component' window (that usually has all the transistors and
+		other devices listed), select 'Top directory' as the "...\LTSpice based\Quantum Thermal Library" and the set of devices 
+		should appear.

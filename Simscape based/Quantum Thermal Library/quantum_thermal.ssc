@@ -1,0 +1,38 @@
+domain quantum_thermal
+% This defines the through (current-like) and across (voltage-like)
+% variables of the quantum thermal circuits.
+%
+% The through variable satisfies a conservation law at each node.
+% The across variable satisfies a uniqueness law at each node.
+%
+% Under the intermediate bath formalism,
+%    Through variable - Heat flow rate
+%    Across variable  - Temperature
+%
+% The domain is constructed without directly specifying its units.
+% The simulation units are decided by the units used to define 
+%    h - Reduced Planck constant
+%    k - Boltzmann constant
+% By default, the natural system of units (h = 1, k = 1) is used.
+% By modifying the definitions (h = 1.0546e-34, k = 1.3806e-23), the 
+% simulation will change to using SI units. The 'Custom Units' block can be 
+% used to redefine these more easily.
+%   
+% Author - Ravi T. Wijesekara
+
+    % Define the through variable
+    variables(Balancing = true)
+        J = {1, '1'} % Heat flow rate
+    end
+    
+    % Define the across variable
+    variables
+        T = {1, '1'} % Temperature
+    end
+
+    % Define parameters
+    parameters 
+        h = {1,'1'}; % Reduced Planck constant
+        k = {1,'1'}; % Boltzmann's constant
+    end
+end
